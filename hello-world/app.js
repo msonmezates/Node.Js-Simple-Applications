@@ -1,9 +1,15 @@
 const os = require('os');
+const fs = require('fs');
 
-const user = os.userInfo();
+let user = os.userInfo();
+let platform = os.platform();
 
-console.log(user.username);
+let date = new Date();
 
-const platform = os.platform();
+let message = `The user ${user.username} started app at ${date}\n`;
 
-console.log(platform);
+fs.appendFile('hello.txt', message, (err) => {
+  if(err) {
+    console.log('error');
+  }
+});
