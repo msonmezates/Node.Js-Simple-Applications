@@ -1,1 +1,1 @@
-console.log('nodemon running');
+console.log(process.argv);
