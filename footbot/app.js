@@ -30,9 +30,17 @@ if(options.name) {
   console.log(`That would be $25.`);
   saveData(data);
 } else if(options.payment) {
-  console.log(`Your change is xxx. Please type --exit to get the order`);
+  data.payment = options.payment;
+  console.log(`Your change is ${ options.payment - 25 }. Please type --exit to get the order`);
+  saveData(data);
 } else if(options.exit) {
+  console.log(data);
   console.log('Thanks for your order!');
+
+  data.name = '';
+  data.order = '';
+  data.payment = '';
+  saveData(data);
 } else {
   console.log('Hello, please enter your name:');
 }
