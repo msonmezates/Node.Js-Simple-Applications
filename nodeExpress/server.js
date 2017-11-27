@@ -4,6 +4,12 @@ const app = express();
 
 app.use("/css", express.static(`${__dirname}/public/css/`));
 
+app.use('/', (req,res,next) => {
+  console.log(`Someone made a request from ${req.url}`);
+  res.cookie('cookieName', 'cookieValue');
+  next();
+});
+
 app.get("/", (req, res) => {
   res.send(`
     <html>
