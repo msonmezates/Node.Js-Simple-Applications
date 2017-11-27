@@ -2,10 +2,15 @@ const express = require('express');
 
 const app = express();
 
+app.use("/css", express.static(`${__dirname}/public/css/`));
+
 app.get("/", (req, res) => {
   res.send(`
     <html>
       <body>
+        <head>
+          <link type="text/css" rel="stylesheet" href="/css/style.css"/>
+        </head>
         <h1>My Node App</h1>
       </body>
     </html>
