@@ -1,15 +1,19 @@
 const express = require('express');
-
+const hbs = require('express-handlebars');
 const app = express();
 
-app.use("/css", express.static(`${__dirname}/public/css/`));
+app.engine('hbs', hbs({ extname: 'hbs' }));
+app.set('view engine', 'hbs');
 
+// ####### MIDDLEWARE ########
+app.use("/css", express.static(`${__dirname}/public/css/`));
 app.use('/', (req,res,next) => {
   console.log(`Someone made a request from ${req.url}`);
   res.cookie('cookieName', 'cookieValue');
   next();
 });
 
+// ######### GET ########
 app.get("/", (req, res) => {
   res.send(`
     <html>
@@ -26,6 +30,13 @@ app.get("/", (req, res) => {
 app.get("/api/user", (req, res) => {
   res.send({
     firstName: "Mehmet", lastName: "Sonmezates"
+  });
+});
+
+app.get("/user", (req, res) => {
+  res.render('user', {
+    name: 'Francis',
+    lastname: 'Jones'
   });
 });
 
