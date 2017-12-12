@@ -2,7 +2,11 @@ const express = require('express');
 const hbs = require('express-handlebars');
 const app = express();
 
-app.engine('hbs', hbs({ extname: 'hbs' }));
+app.engine('hbs', hbs({
+  extname: 'hbs',
+  defaultLayout: 'layout',
+  layoutsDir: __dirname + '/views/layouts'
+}));
 app.set('view engine', 'hbs');
 
 // ####### MIDDLEWARE ########
@@ -35,6 +39,7 @@ app.get("/api/user", (req, res) => {
 
 app.get("/user", (req, res) => {
   res.render('user', {
+    title: 'User profile',
     name: 'Francis',
     lastname: 'Jones'
   });
