@@ -41,7 +41,12 @@ app.get("/user", (req, res) => {
   res.render('user', {
     title: 'User profile',
     name: 'Francis',
-    lastname: 'Jones'
+    lastname: 'Jones',
+    valid: true,
+    pets: ['dog', 'cat', 'fish'],
+    parents: [
+      { dad:'Mario', mother:'Martha' }
+    ]
   });
 });
 
