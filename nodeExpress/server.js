@@ -37,6 +37,10 @@ app.get("/api/user", (req, res) => {
   });
 });
 
+app.get("/enteruser", (req, res) => {
+  res.render('enteruser')
+});
+
 app.get("/user", (req, res) => {
   res.render('user', {
     title: 'User profile',
