@@ -1,5 +1,6 @@
 const express = require('express');
 const hbs = require('express-handlebars');
+const bodyParser = require('body-parser');
 const app = express();
 
 app.engine('hbs', hbs({
@@ -8,6 +9,8 @@ app.engine('hbs', hbs({
   layoutsDir: __dirname + '/views/layouts'
 }));
 app.set('view engine', 'hbs');
+
+const urlencodeParser = bodyParser.urlencoded({extended: false})
 
 // ####### MIDDLEWARE ########
 app.use("/css", express.static(`${__dirname}/public/css/`));
@@ -41,6 +44,15 @@ app.get("/enteruser", (req, res) => {
   res.render('enteruser')
 });
 
+// POST
+app.post("/enteruser", urlencodeParser, (req, res) => {
+  const firstname = req.body.firstname;
+  const lastname = req.body.lastname;
+
+  console.log(firstname, lastname);
+});
+
+// ####### RENDER FROM TABLE ######
 app.get("/user", (req, res) => {
   res.render('user', {
     title: 'User profile',
