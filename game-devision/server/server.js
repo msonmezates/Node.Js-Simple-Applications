@@ -5,8 +5,11 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const moment = require('moment');
 const config = require('./config/config').get(process.env.NODE_ENV); //by default heroku assigns this to production
-const {User} = require('./models/user');
 const {auth} = require('./middleware/auth');
+// MODELS
+const {User} = require('./models/user');
+const {Article} = require('./models/article');
+const {UserReview} = require('./models/user_reviews');
 
 const app = express();
 
@@ -31,7 +34,12 @@ app.use(cookieParser());
 
 // GET Route
 app.get('/', (req, res) => {
-  res.render('home');
+  Article.find().sort({_id: 'asc'}).limit(10).exec((err, doc) => { // ascending order by mongoose id, limit articles upto 10
+    if(err) return res.status(400).send(err);
+    res.render('home', {
+      articles: doc
+    });
+  });
 });
 
 app.get('/register', auth, (req, res) => {
@@ -42,6 +50,57 @@ app.get('/register', auth, (req, res) => {
 app.get('/login', auth, (req, res) => {
   if(req.user) return res.redirect('/dashboard');
   res.render('login');
+});
+
+app.get('/games/:id', auth, (req, res) => {
+  let addReview = req.user ? true : false;
+  Article.findById(req.params.id, (err, article) => {
+    if(err) res.status(400).send(err);
+
+    UserReview.find({'postId': req.params.id}).limit(10).exec((err, UserReviews) => {
+      if(err) res.status(400).send(err);
+      res.render('article', {
+        date: moment(article.createdAt).format('MM/DD/YYYY'),
+        article,
+        review: addReview,
+        UserReviews
+      });
+    });
+  });
+});
+
+app.get('/dashboard',auth, (req, res) => {
+  if(!req.user) return res.redirect('/login');
+  res.render('dashboard', {
+    dashboard: true,
+    isAdmin: req.user.role === 1 ? true : false
+  });
+});
+
+app.get('/dashboard/articles', auth, (req, res) => {
+  if(!req.user) return res.redirect('/login');
+  res.render('admin_articles', {
+    dashboard: true,
+    isAdmin: req.user.role === 1 ? true : false
+  });
+});
+
+app.get('/dashboard/reviews', auth, (req, res) => {
+  if(!req.user) return res.redirect('/login');
+  UserReview.find({'ownerId': req.user._id}).exec((err, userReviews) => {
+    res.render('admin_reviews', {
+      dashboard: true,
+      isAdmin: req.user.role === 1 ? true : false,
+      userReviews
+    });
+  });
+});
+
+app.get('/dashboard/logout', auth, (req, res) => {
+  req.user.deleteToken(req.token, (err, user) => {
+    if(err) return res.status(400).send(err);
+    res.redirect('/');
+  });
 });
 
 // POST Route
@@ -69,6 +128,37 @@ app.post('/api/login', (req, res) => {
         res.cookie('auth', user.token).send('ok');
       });
     }); 
+  });
+});
+
+app.post('/api/add_article', auth, (req, res) => {
+  const article = new Article({
+    ownerUsername: req.user.username,
+    ownerId: req.user._id,
+    title: req.body.title,
+    review: req.body.review,
+    rating: req.body.rating
+  });
+
+  article.save((err, article) => {
+    if(err) return res.status(400).send(err);
+    res.status(200).send();
+  });
+});
+
+app.post('/api/user_review', auth, (req, res) => {
+  const userReview = new UserReview({
+    postId: req.body.id,
+    ownerUsername: req.user.username, //this comes from auth middleware
+    ownerId: req.user._id,
+    titlePost: req.body.titlePost,
+    review: req.body.review,
+    rating: req.body.rating
+  });
+
+  userReview.save((err, doc) => {
+    if(err) res.status(400).send(err);
+    res.status(200).send();
   });
 });
 
