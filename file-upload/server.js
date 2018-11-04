@@ -29,9 +29,12 @@ app.post('/api/uploads',(req, res) =>{
         limits: { fileSize: 5000000 }, 
         fileFilter: (req, file, cb) => {
             const ext = path.extname(file.originalname);
-            ext === '.png' ? cb(null, true) : cb(res.status(400).end('only png is allowed'), false);
+            ext === '.png' || ext === '.jpg' ? cb(null, true) : cb(res.status(400).end('only png and jpg are allowed'), false);
         }
-    }).single('image');
+    }).fields([
+        { name: 'image', maxCount: 2 },
+        { name: 'image2', maxCount: 10 }
+    ]);
     
     upload(req, res, function(err) {
         if (err) {
