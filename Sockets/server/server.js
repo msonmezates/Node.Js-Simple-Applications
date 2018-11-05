@@ -11,18 +11,26 @@ app.use(express.static(__dirname + '/../public'));
 io.on('connection', (socket) => {
   console.log('socket io is connected');
 
-  // Listen to a custom event
-  socket.on('sendMessage', (newMessage, cb) => {
-    console.log(`Message received from client: ${newMessage}`);
+  socket.on('join', (data) => {
+    console.log(data);
 
-    // Emit a custom event to all sockets
-    socket.broadcast.emit('newMessage', {
-      from: 'John Doe',
-      message: 'Test message'
-    });
+    socket.join(`room-${data.room}`);
 
-    cb();
+    socket.broadcast.to(`room-${data.room}`).emit('userJoined', `${data.user} joined the room.`);
   });
+
+  // // Listen to a custom event
+  // socket.on('sendMessage', (newMessage, cb) => {
+  //   console.log(`Message received from client: ${newMessage}`);
+
+  //   // Emit a custom event to all sockets
+  //   socket.broadcast.emit('newMessage', {
+  //     from: 'John Doe',
+  //     message: 'Test message'
+  //   });
+
+  //   cb();
+  // });
 
   socket.on('disconnect', () => {
     console.log('User disconnected from server');
