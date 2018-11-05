@@ -11,15 +11,17 @@ app.use(express.static(__dirname + '/../public'));
 io.on('connection', (socket) => {
   console.log('socket io is connected');
 
-  // Emit a custom event to the socket
-  socket.emit('newMessage', {
-    from: 'John Doe',
-    message: 'Test message'
-  });
-
   // Listen to a custom event
-  socket.on('sendMessage', (message) => {
-    console.log(`Message received from client: ${message}`);
+  socket.on('sendMessage', (newMessage, cb) => {
+    console.log(`Message received from client: ${newMessage}`);
+
+    // Emit a custom event to all sockets
+    socket.broadcast.emit('newMessage', {
+      from: 'John Doe',
+      message: 'Test message'
+    });
+
+    cb();
   });
 
   socket.on('disconnect', () => {

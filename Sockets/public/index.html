@@ -6,9 +6,12 @@
   </head>
 
   <body>
-    hello
+    <div class="send_message" style="background: green; padding: 10px">
+      Send a message
+    </div>
   </body>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script>
     
@@ -21,11 +24,15 @@
       socket.on('newMessage', function(message) {
         console.log('New message received: ', message);
       });
-
-      // Another custom event
-      socket.emit('sendMessage', {
-        from: 'Client',
-        message: 'Socket.io test'
+      
+      $('.send_message').on('click', function() {
+        // Custom event
+        socket.emit('sendMessage', {
+          from: 'Client',
+          message: 'Socket.io test'
+        }, function() {
+          console.log('Message sent');
+        });
       });
 
       socket.on('disconnect', function() {
