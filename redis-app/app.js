@@ -30,6 +30,16 @@ app.get('/', (req, res) => {
   });
 });
 
+app.post('/task/add', (req, res) => {
+  let task = req.body.task;
+
+  client.rpush('tasks', task, (err, reply) => {
+    if (err) console.log(err);
+    console.log('Task Added');
+    res.redirect('/');
+  })
+});
+
 app.listen(5000, () => console.log('server started on port 5000'));
 
 module.exports = app;
