@@ -40,6 +40,21 @@ app.post('/task/add', (req, res) => {
   })
 });
 
+app.post('/task/delete', (req, res) => {
+  let tasksToDlete = req.body.tasks;
+
+  client.lrange('tasks', 0, -1, (err, tasks) => {
+    tasks.map(task => {
+      if (tasksToDlete.indexOf(task) > -1) {
+        client.lrem('tasks', 0, task, () => {
+          if (err) console.log(err)
+        });
+      }
+    });
+    res.redirect('/');
+  });
+});
+
 app.listen(5000, () => console.log('server started on port 5000'));
 
 module.exports = app;
