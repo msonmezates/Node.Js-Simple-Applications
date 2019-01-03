@@ -23,10 +23,13 @@ app.get('/', (req, res) => {
   let title = 'Task List';
 
   client.lrange('tasks', 0, -1, (err, reply) => {
-    res.render('index', {
-       title,
-       tasks: reply 
-      });
+    client.hgetall('call', (err, call) => {
+      res.render('index', {
+        title,
+        tasks: reply ,
+        call
+       });
+    });
   });
 });
 
@@ -51,6 +54,17 @@ app.post('/task/delete', (req, res) => {
         });
       }
     });
+    res.redirect('/');
+  });
+});
+
+app.post('/call/add', (req, res) => {
+  const { name, company, phone, time } = req.body;
+  const newCall = { name, company, phone, time };
+
+  client.hmset('call', ['name', newCall.name, 'company', newCall.company, 'phone', newCall.phone, 'time', newCall.time], (err, reply) => {
+    if(err) console.log('Error', err);
+    console.log(reply);
     res.redirect('/');
   });
 });
